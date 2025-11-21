@@ -1,204 +1,180 @@
-📘 Ringkasan Lengkap Modul Praktikum Basis Data (Bab 1–2)
-## BAB 1 – Review Konversi ER Diagram ke Skema Relasi
+📘 **Rangkuman Lengkap Bab 1 – Bab 2
+
+Modul Praktikum Basis Data (MySQL)**
+
+---------------------------------------------
+BAB 1 — Review Konversi ER Diagram ke Skema Relasi
+
+Bab ini menjelaskan proses penting dalam perancangan basis data, yaitu bagaimana mengubah Entity Relationship Diagram (ERD) menjadi skema relasi, lalu meneruskannya menjadi struktur tabel fisik pada basis data.
+
 🎯 Tujuan Pembelajaran
 
-Bab ini bertujuan agar praktikan:
+Memahami konsep dasar dalam ERD:
 
-Memahami cara mengonversi ER Diagram → Skema Relasi → Tabel fisik.
+Entitas, atribut, primary key, relasi, kardinalitas.
 
-Dapat melakukan transformasi dari level konseptual (ERD) ke level fisik (tabel database).
+Mampu melakukan proses transformasi:
 
-Siap membangun database MySQL berdasarkan desain ERD.
+ERD → Diagram Relationship → Tabel Relasional.
 
-### 1. Dasar-dasar Konversi ER Diagram
+Mempersiapkan praktikan untuk proses pembuatan database di level fisik.
 
-Berikut aturan lengkap saat mengubah ER Diagram menjadi tabel:
+🔍 Konsep Dasar
+1. Entitas
 
-1️⃣ Strong Entity → Tabel
+Objek nyata yang menjadi pusat data (misal: Mahasiswa, Pegawai, Buku).
+Setiap entitas memiliki atribut, dimana salah satu harus menjadi primary key (PK).
 
-Nama entitas menjadi nama tabel.
+2. Relasi
 
-Atribut sederhana menjadi kolom.
+Hubungan antar entitas, memiliki kardinalitas seperti:
 
-Primary key tetap.
+1 : 1 (One to One)
 
-Contoh:
-Entitas: Karyawan(nip, nama, alamat, tgl_lahir)
-Tabel: Karyawan(nip PK, nama, alamat, tgl_lahir)
+1 : N (One to Many)
 
-2️⃣ Composite Attribute
+N : M (Many to Many)
 
-Atribut majemuk dipecah menjadi beberapa kolom.
+3. Atribut
 
-Atribut induknya tidak menjadi kolom.
+Jenis atribut dalam ERD:
 
-Contoh: alamat → jalan, kota, provinsi, kode_pos.
+Simple atribut
 
-3️⃣ Multivalue Attribute
+Composite atribut
 
-Menjadi tabel baru.
+Multivalue atribut
 
-FK dari entitas induk digunakan.
+Derived atribut
 
-Contoh:
+🧭 Aturan Konversi ERD ke Skema Relasi
 
-Karyawan memiliki banyak hobi → tabel Hobby_Karyawan(nip FK, hobby)
+Konversi dilakukan menggunakan aturan berikut:
 
-4️⃣ Derived Attribute
+1. Entitas Kuat → 1 Tabel
 
-Dapat dibuat menjadi kolom biasa jika perlu.
+Atribut menjadi kolom.
 
-Contoh: umur dapat disimpan sebagai kolom.
+PK menjadi primary key tabel.
 
-5️⃣ Weak Entity
+2. Composite Atribut
 
-Menjadi tabel baru.
+Dipecah menjadi kolom-kolom individual.
+Contoh: alamat {jalan, kota, kode_pos}.
 
-PK terdiri dari PK strong entity + partial key.
+3. Multivalue Atribut → Tabel Baru
 
-Contoh: Tanggungan(nip FK, nama_tgg, hubungan)
+Contoh: Atribut hobby pada entitas Karyawan → tabel baru Hobby_Karyawan.
 
-6️⃣ Relationship 1-to-1
+4. Derived Atribut
 
-Tambahkan FK pada salah satu tabel.
+Tetap disimpan sebagai kolom jika diperlukan oleh aplikasi.
 
-Dua alternatif:
+5. Entitas Lemah
 
-FK di entitas A
+Menjadi tabel baru dan memperoleh foreign key dari entitas kuat.
 
-FK di entitas B
+6. Relasi 1–1
 
-Bergantung pada total participation.
+Foreign key diletakkan pada salah satu entitas berdasarkan kebutuhan.
 
-7️⃣ Relationship 1-to-N
+7. Relasi 1–N
 
-FK diletakkan pada entitas sisi N.
+Foreign key disimpan pada entitas N (many).
 
-Contoh:
-Karyawan (1) — mencatat — (N) Peminjaman
-FK: Peminjaman.nip → Karyawan.nip
+8. Relasi N–N
 
-8️⃣ Relationship M-to-N
+Harus dibuatkan tabel baru yang menyimpan minimal dua FK dan atribut relasi.
 
-Dibuat tabel relasi baru.
+9. Relasi dengan atribut
 
-Berisi:
+Jika relasi memiliki atribut, maka relasi menjadi tabel baru.
 
-FK entitas A
+10. Unary Relationship (Self-Relationship)
 
-FK entitas B
+Menghasilkan tabel yang tetap sama tetapi ditambah FK yang menunjuk dirinya sendiri.
 
-Atribut relasi (jika ada)
+11. Ternary Relationship
 
-Kadang menggunakan surrogate PK
+Menghasilkan satu tabel relasi tambahan dengan FK ke semua entitas.
 
-9️⃣ Unary Relationship
+12. Generalisasi / Spesialisasi
 
-1-to-1 → FK mengacu ke tabel yang sama
+Dapat menggunakan dua pendekatan:
 
-M-to-N → tabel relasi baru
+Superclass–Subclass (Tabel induk → tabel anak)
 
-🔟 Ternary Relationship
+Hanya tabel subclass, dimana tabel tersebut menyimpan atribut superclass.
 
-3 entitas → 4 tabel total
+13. Agregasi
 
-Tabel relasi berisi 3 FK + atribut relasi
+Relasi kompleks (misalnya relasi dari relasi) menghasilkan tabel baru yang mengacu pada entitas terkait.
 
-1️⃣1️⃣ Generalisasi / Spesialisasi (ISA)
+🧪 Studi Kasus: Skema Pembayaran Apotik
 
-Dua metode:
+ERD apotik memiliki entitas seperti:
 
-Metode 1:
+Pasien, Pegawai, Obat, Resep, Pembayaran, Kategori_Obat, Retur, dll.
 
-Ada tabel superclass
+Dikonversi menjadi 13 tabel, misalnya:
 
-Ada tabel subclass
+PASIEN
 
-Subclass memiliki PK = PK superclass
+RESEP
 
-Metode 2:
+OBAT
 
-Hanya tabel subclass
+DETAIL_OBAT
 
-Semua atribut superclass diturunkan ke subclass
+PEGAWAI
 
-1️⃣2️⃣ Agregasi
+PEMBAYARAN
 
-Relasi kompleks yang butuh tabel ekstra
+RETUR
 
-Kombinasi M-to-N dan relasi lainnya
+DETAIL_RETUR
 
-### Studi Kasus Besar: Skema Pembayaran Apotik
+KATEGORI_OBAT
 
-ERD terdiri dari entitas:
+dan lainnya.
 
-Pasien, Pasien_BPJS, Pasien_NonBPJS
+Semua tabel memiliki hubungan yang digambarkan menggunakan foreign key dan tanda panah referensi.
 
-Resep
+---------------------------------------------
+BAB 2 — Pengantar Basis Data & DDL
 
-Obat, Kategori_Obat
+Bab ini membahas pengenalan database, DBMS, MySQL, cara instalasi, serta penggunaan perintah dasar DDL untuk membuat database.
 
-Detail_Obat
-
-Pembayaran
-
-Pegawai
-
-Retur, Detail_Retur
-
-Total tabel hasil konversi: 13 tabel
-
-Contoh tabel:
-
-PASIEN(#NoPasien, nama, alamat, pekerjaan, No_KTP)
-
-OBAT(#KodeObat, Id_kategori, harga, dosis, jumlah)
-
-RESEP(#NoResep, NoPasien, total, AsalDokter)
-
-DETAIL_OBAT(#Id_det_ob, NoResep, KodeObat, Jumlah, Subtotal)
-
-Semua foreign key ditandai dengan FK.
-
-### Test Akhir Bab 1
-
-Mengonversi ERD “Musisi – Promotor – Album – Gedung” menjadi tabel relasi.
-
-Menghitung jumlah tabel.
-
-## BAB 2 – Pengantar Basis Data & DDL
 🎯 Tujuan Pembelajaran
 
-Memahami konsep dasar database & DBMS.
+Memahami konsep dasar basis data dan DBMS.
 
-Mengenal MySQL, instalasi, akses, command line, dan client.
+Mengetahui aplikasi pendukung MySQL seperti XAMPP.
 
-Menggunakan perintah dasar DDL (Data Definition Language):
+Mampu mengakses MySQL server & client.
 
-CREATE
+Memahami tipe data MySQL.
 
-SHOW
+Dapat menggunakan DDL untuk membuat database.
 
-USE
+📚 Apa itu Database & DBMS?
+Database
 
-DROP
+Kumpulan data yang:
 
-### 2. Apa itu Database & DBMS?
-📌 Database
+Terorganisir,
 
-Kumpulan data yang terorganisir.
+Terstruktur,
 
-Disimpan secara sistematis agar mudah diakses.
+Disimpan secara sistematis dalam tabel,
 
-📌 DBMS (Database Management System)
+Dikelola oleh DBMS.
 
-Software untuk mengelola database.
+DBMS (Database Management System)
 
-Contoh:
+Aplikasi pengelola database, contoh:
 
 MySQL
-
-MariaDB
 
 PostgreSQL
 
@@ -206,81 +182,91 @@ Oracle
 
 SQL Server
 
-### 3. MySQL
+MariaDB
 
-MySQL adalah DBMS open source yang:
+🛠️ MySQL
 
-Cepat, stabil, dan sangat populer.
+MySQL adalah DBMS yang:
 
-Mendukung multi-platform.
+Cepat dan reliable
 
-Menggunakan bahasa SQL.
+Open source
 
-Mendukung multi-user & multithread.
+Mendukung multithread
 
-Sangat cocok untuk aplikasi web.
+Mendukung multiuser
 
-### 4. Instalasi MySQL
+Dapat dijalankan di berbagai OS
 
-Direkomendasikan menggunakan XAMPP
+Alasan menggunakan MySQL:
 
-XAMPP versi terbaru menggunakan MariaDB
+Gratis
 
-Perintah SQL tetap sama seperti MySQL
+Banyak komunitas
 
-### 5. MySQL Server & Client
-MySQL Server
+Banyak digunakan di web development
 
-Menyimpan database
+Terintegrasi dengan PHP dan XAMPP
 
-Dijalankan melalui XAMPP Control Panel
+⚙️ Instalasi MySQL
 
-MySQL Client
+Direkomendasikan menggunakan XAMPP, karena sudah termasuk:
 
-Program untuk mengetik perintah SQL
+Apache
 
-File: mysql.exe berada di xampp/mysql/bin
+MariaDB/MySQL
 
-### 6. Mengakses MySQL via CMD
+PHP
 
-CMD:
+phpMyAdmin
+
+🖥️ Mengakses MySQL
+
+Melalui CMD:
 
 cd C:\xampp\mysql\bin
 mysql -u root -p
 
 
-Password default: kosong
+Jika password belum dibuat, cukup tekan enter.
 
-Keluar dari MySQL:
+📁 Struktur File Database MySQL
+OS	Lokasi Database	Lokasi Web
+Windows	C:\xampp\mysql\data	C:\xampp\htdocs
+Linux	/opt/lampp/var/mysql	/opt/lampp/htdocs
+🧷 MySQL Client
 
-\q
+Aplikasi CLI (Command Line Interface) bernama:
 
-### 7. Tipe Data MySQL
-Tipe Data	Keterangan	Format/Ukuran
-INT	Bilangan bulat	-2147483648 s/d +2147483647
-FLOAT	Angka desimal	
-DATE	Tanggal	YYYY-MM-DD
-DATETIME	Tanggal & waktu	YYYY-MM-DD HH:MM:SS
-CHAR(n)	String panjang tetap	1-255
-VARCHAR(n)	String fleksibel	1-255
-BLOB	Data besar	≤ 65.535 byte
-LONGBLOB	Data lebih besar	≤ 4GB
-### 8. Database Relasional
+mysql.exe
 
-Database = kumpulan tabel
-Tabel = kumpulan kolom (field) dan baris (record)
 
-Untuk membuat tabel → harus berada di dalam database terlebih dahulu.
+Semua perintah harus diakhiri titik koma (;).
 
-### 9. Perintah DDL (Data Definition Language)
-1️⃣ CREATE DATABASE
-CREATE DATABASE nama_db;
+🔤 Tipe Data MySQL
 
-2️⃣ SHOW DATABASES
+Beberapa tipe data penting:
+
+Tipe	Deskripsi
+INT	Bilangan bulat
+FLOAT	Desimal
+CHAR	Panjang tetap
+VARCHAR	Panjang dinamis
+DATE	Format tanggal YYYY-MM-DD
+DATETIME	Tanggal & waktu
+BLOB	Data biner
+📐 DDL (Data Definition Language)
+
+DDL digunakan untuk membuat atau mengubah struktur database.
+
+1. Membuat Database
+CREATE DATABASE praktikum;
+
+2. Melihat Daftar Database
 SHOW DATABASES;
 
-3️⃣ USE DATABASE
-USE nama_db;
+3. Menggunakan Database
+USE praktikum;
 
-4️⃣ DROP DATABASE
-DROP DATABASE nama_db;
+4. Menghapus Database
+DROP DATABASE praktikum;
